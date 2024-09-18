@@ -23,7 +23,8 @@ import { FinishOrderController } from './controllers/order/FinishOrderController
 import { isAuthenticated } from './middlewares/isAuthenticated';
 
 import uploadConfig from './config/multer';
-
+import { ForgotPasswordController } from './controllers/user/ForgotPasswordController';
+import { ResetPasswordUserController } from './controllers/user/ResetPasswordUserController';
 
 const router = Router();
 
@@ -36,6 +37,9 @@ router.post('/session', new AuthUserController().handle)
 
 router.get('/me', isAuthenticated, new DetailUserController().handle)
 
+router.post('/forgotPassword', new ForgotPasswordController().handle)
+
+router.post('/resetPassword/:token', new ResetPasswordUserController().handle);
 
 // ROTAS CATEGORY
 router.post('/category', isAuthenticated, new CreateCategoryController().handle)
