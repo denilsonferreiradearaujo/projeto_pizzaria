@@ -1,6 +1,6 @@
 import axios, {AxiosError} from 'axios';
 import { parseCookies } from 'nookies';
-import { AuthTokenErros } from './erros/AuthTokenError';
+import { AuthTokenError } from './erros/AuthTokenError';
 
 import { signOut } from '../contexts/AuthContext';
 
@@ -25,7 +25,7 @@ export function setupAPICliente(ctx = undefined){
                 // Chamar a função para deslogar o usuario
                 signOut();
             }else{
-                return Promise.reject(new AuthTokenErros)
+                return Promise.reject(new AuthTokenError)
             }
         }
 

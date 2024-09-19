@@ -78,6 +78,10 @@ export default function Home() {
             <Link legacyBehavior href="/signup">
               <a className={styles.text}>Não possui uma conta? Cadastre-se</a>
             </Link>
+
+            <Link legacyBehavior  href="/forgotPassword">
+                <a className={styles.text}>Esqueceu sua senha?</a>
+            </Link>
             
           </form>
         </div>

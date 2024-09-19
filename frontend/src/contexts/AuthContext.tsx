@@ -14,6 +14,8 @@ type AuthContextData = {
     signIn: (credentials: SignInProps) => Promise<void>;
     signOut: () => void;
     signUp: (credentials: SignUpProps) => Promise<void>;
+    forgotPass: (credentials: forgotPassProps) => Promise<void>;
+    resetPass: (credentials: resetPassProps) => Promise<void>;
 }
 
 type UserProps = {
@@ -31,6 +33,15 @@ type SignUpProps = {
     name: string;
     email: string;
     password: string;
+}
+
+type forgotPassProps = {
+    email: string;
+}
+
+type resetPassProps = {
+    password: string;
+    token: string | string[];
 }
 
 type AuthProviderProps = {
@@ -132,8 +143,43 @@ export function AuthProvider({ children }: AuthProviderProps){
         }
     }
 
+    async function forgotPass ({email}: forgotPassProps){
+        try{
+            const response = await api.post('/forgotPassword', {
+                email
+            })
+
+            // console.log("Cadastrado com sucesso!")
+            toast.success('Email enviado para redefinição da senha!')
+
+            // Redireciona o usuário para a pagina principal
+            Router.push('/')
+
+        }catch(err){
+            toast.error('Erro ao tentar realizar redefinição da senha.')
+            console.log('erro tentar redefinir senha.', err)
+        }
+    }
+
+    async function resetPass ({password, token}: resetPassProps){
+        try{
+            const response = await api.post(`/resetPassword/${token}`, {
+                password
+            })
+
+            // console.log("Cadastrado com sucesso!")
+            toast.success('Senha redefinida com sucesso!')
+
+            Router.push('/')
+
+        }catch(err){
+            toast.error('Erro ao tentar realizar redefinição da senha.');
+            console.log('Erro ao tentar redefinir senha.', err);
+        }
+    }
+
     return(
-        <AuthContext.Provider value={{ user, isAuthenticated, signIn, signOut, signUp }}>
+        <AuthContext.Provider value={{ user, isAuthenticated, signIn, signOut, signUp, forgotPass, resetPass }}>
             {children}
         </AuthContext.Provider>
     )

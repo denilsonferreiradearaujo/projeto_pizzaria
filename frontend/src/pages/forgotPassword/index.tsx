@@ -14,34 +14,27 @@ import { Button } from "../../components/ui/button";
 import { AuthContext } from "../../contexts/AuthContext";
 import { toast } from "react-toastify";
 
-import Link from "next/link";
-
-
-export default function SignUp() {
-    const {signUp} = useContext(AuthContext);
-
-    const [name, setName] = useState('');
+export default function ForgotPass() {
+    const {forgotPass} = useContext(AuthContext);
+    
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     
-    async function handleSignUp(event: FormEvent){
+    async function handleForgotPass(event: FormEvent){
         event.preventDefault();
 
-        if(name === '' || email === '' || password === ''){
-            toast.error("Preencha todos os campos")
+        if(email === ''){
+            toast.error("Preencha com seu email válido.")
             return;
         }
 
         setLoading(true);
 
         let data = {
-            name,
             email,
-            password,
         }
 
-        await signUp(data)
+        await forgotPass(data)
 
         setLoading(false);
     }
@@ -49,45 +42,29 @@ export default function SignUp() {
   return (
     <>
       <Head>
-        <title>Faça seu cadastro agora!</title>
+        <title>Redefinir senha!</title>
       </Head>
       <div className={styles.containerCenter}>
         <Image src={logoImg} alt="Logo Pizzaria "/>
 
         <div className={styles.login}>
-            <h1>Criando sua conta</h1>
+            <h1>Redefinir senha</h1>
 
-          <form onSubmit={handleSignUp}>
+          <form onSubmit={handleForgotPass}>
             <Input
-              placeholder="Digite seu nome"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-            <Input
-              placeholder="Digite seu email"
+              placeholder="informe seu email"
               type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-            />
-            <Input
-              placeholder="Digite sua senha"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
             />
             
             <Button
               type="submit"
               loading={loading}
             >
-              Cadastrar
-            </Button>
+              Enviar
+            </Button>            
 
-            <Link legacyBehavior  href="/">
-                <a className={styles.text}>Já possui uma conta? Faça o login</a>
-            </Link>
-            
           </form>
         </div>
 
