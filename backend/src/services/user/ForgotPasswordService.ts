@@ -18,6 +18,8 @@ class ForgotPasswordService {
         if (!user) {
             throw new Error("User not found.");
         }
+
+        console.log(user)
         
          // Gerar token de redefinição de senha usando JWT
         const resetToken = sign(
