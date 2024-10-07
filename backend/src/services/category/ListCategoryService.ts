@@ -2,10 +2,10 @@ import prismaCliente from "../../prisma";
 
 class ListCategoryService{
     async execute(){
-        const category = await prismaCliente.category.findMany({
+        const category = await prismaCliente.categoria.findMany({
             select:{
                 id: true,
-                name: true,
+                nome: true,
             }
         })
 

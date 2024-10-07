@@ -22,13 +22,13 @@ export default function Home() {
   const {signIn} = useContext(AuthContext);
 
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
 
   async function handleLogin(event: FormEvent ){
     event.preventDefault();
 
-    if(email === "" || password === ""){
+    if(email === "" || senha === ""){
       toast.error("Preencha todos os campos")
       return;
     }
@@ -37,7 +37,7 @@ export default function Home() {
 
     let data = {
       email,
-      password
+      senha
     }
 
     await signIn(data)
@@ -64,8 +64,8 @@ export default function Home() {
             <Input
               placeholder="Digite sua senha"
               type="password"
-              value={password}
-              onChange={ (e) => setPassword(e.target.value)}
+              value={senha}
+              onChange={ (e) => setSenha(e.target.value)}
             />
 
             <Button

@@ -1,98 +1,173 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Criar uma migration: yarn ou npx prisma migrate dev
+
+// Atualizar uma migração: npx prisma migrate dev --name nome-da-migracao
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-//  Criar uma migration ----- yarn pu npx prisma migrate dev 
-model User {
-  id String @id @default(uuid())
-  name String
-  email String
-  password String
-  created_at DateTime? @default(now())
-  updated_at DateTime? @default(now())
-
-  passwordResetTokens PasswordResetToken[] // Relacionamento com PasswordResetToken
-
-  @@map("users")
+model Pessoa {
+  id          Int        @id @default(autoincrement())
+  nome        String     @db.VarChar(100)
+  genero      String     @db.VarChar(45)
+  dataNasc    DateTime   @map("data_nasc")
+  cpf         String     @db.VarChar(11)
+  email       String     @db.VarChar(100)
+  tipo        String     @db.VarChar(45)
+  status      Int        @default(1)
+  dataCreate  DateTime   @default(now()) @map("data_create")
+  dataUpdate  DateTime?  @map("data_update")
+  enderecos   Endereco[]
+  logins      Login[]
+  pedidos     Pedido[]
+  telefones   TelefonePessoa[]
+  passwordResetTokens PasswordResetToken[]
 }
 
-model Category {
-  id String @id @default(uuid())
-  name String
-  created_at DateTime? @default(now())
-  updated_at DateTime? @default(now())
-
-  @@map("categories")
-
-  products Product[]
+model Endereco {
+  id          Int        @id @default(autoincrement())
+  pessoaId    Int
+  cep         String     @db.VarChar(8)
+  logradouro  String     @db.VarChar(100)
+  numero      String     @db.VarChar(10)
+  complemento String?    @db.VarChar(100)
+  bairro      String     @db.VarChar(45)
+  cidade      String     @db.VarChar(45)
+  uf          String     @db.VarChar(45)
+  dataCreate  DateTime   @default(now()) @map("data_create")
+  dataUpdate  DateTime?  @map("data_update")
+  Pessoa      Pessoa     @relation(fields: [pessoaId], references: [id], onDelete: NoAction)
 }
 
-model Product {
-  id String @id @default(uuid())
-  name String
-  price String
-  description String
-  banner String
-  created_at DateTime? @default(now())
-  updated_at DateTime? @default(now())
-
-  category Category @relation(fields: [category_id], references: [id])
-
-  @@map("products")
-  category_id String
-  items Item[]
+model Login {
+  id        Int       @id @default(autoincrement())
+  pessoaId  Int
+  senha     String    @db.VarChar(500)
+  tipoLogin String   @db.VarChar(45) @map("tipo_login") @default("ativo")
+  Pessoa    Pessoa    @relation(fields: [pessoaId], references: [id], onDelete: NoAction)
 }
 
-model Order {
-  id String @id @default(uuid())
-  table Int
-  status Boolean @default(false)
-  draft  Boolean @default(true)
-  name String?
-  created_at DateTime? @default(now())
-  updated_at DateTime? @default(now())
+model Telefone {
+  id                Int     @id @default(autoincrement())
+  telefoneResidencial String?
+  telefoneCelular   String?
+  pessoas           TelefonePessoa[]
+}
 
-  @@map("orders")
-  items Item[]
+
+model TelefonePessoa {
+  pessoaId  Int
+  telefoneId Int
+  Pessoa    Pessoa   @relation(fields: [pessoaId], references: [id], onDelete: NoAction)
+  Telefone  Telefone @relation(fields: [telefoneId], references: [id], onDelete: NoAction)
+
+  @@id([pessoaId, telefoneId])
+}
+
+model TaxaEntrega {
+  id           Int      @id @default(autoincrement())
+  distanciaMin Int       @map("distancia_min")
+  distanciaMax Int       @map("distancia_max")
+  valor        Decimal   @db.Decimal(12, 2)
+  dataCreate   DateTime  @default(now()) @map("data_create")
+  dataUpdate   DateTime? @map("data_update")
+  pedidos      Pedido[]
+}
+
+model Pedido {
+  id           Int          @id @default(autoincrement())
+  pessoaId     Int?
+  taxaEntregaId Int
+  status       String       @db.VarChar(45)
+  numMesa      Int          @map("num_mesa")
+  valTotal     Decimal      @db.Decimal(12, 2) @map("val_total")
+  dataCreate   DateTime     @default(now()) @map("data_create")
+  dataUpdate   DateTime?    @map("data_update")
+  Pessoa       Pessoa?      @relation(fields: [pessoaId], references: [id], onDelete: NoAction)
+  TaxaEntrega  TaxaEntrega  @relation(fields: [taxaEntregaId], references: [id], onDelete: NoAction)
+  items        Item[]
+}
+
+model Categoria {
+  id          Int          @id @default(autoincrement())
+  nome        String       @db.VarChar(100)
+  dataCreate  DateTime     @default(now()) @map("data_create")
+  dataUpdate  DateTime?    @map("data_update")
+  produtos    Produto[]
+}
+
+model Produto {
+  id          Int          @id @default(autoincrement())
+  categoriaId Int
+  nome        String       @db.VarChar(150)
+  dataCreate  DateTime     @default(now()) @map("data_create")
+  dataUpdate  DateTime?    @map("data_update")
+  Categoria   Categoria    @relation(fields: [categoriaId], references: [id], onDelete: NoAction)
+  itens       Item[]
+  tamanhos    Tamanho[]
+  valores     Valor[]
 }
 
 model Item {
-  id String @id @default(uuid())
-  amount Int
-  created_at DateTime? @default(now())
-  updated_at DateTime? @default(now())
+  id         Int        @id @default(autoincrement())
+  produtoId  Int
+  pedidoId   Int
+  quantidade Int
+  idValor    Int        @map("id_valor")
+  dataCreate DateTime   @default(now()) @map("data_create")
+  dataUpdate DateTime?  @map("data_update")
+  Produto    Produto    @relation(fields: [produtoId], references: [id], onDelete: NoAction)
+  Pedido     Pedido     @relation(fields: [pedidoId], references: [id], onDelete: NoAction)
+  sabores    SaboresPizza[]
+}
 
-  order Order @relation(fields: [order_id], references: [id])
-  product Product @relation(fields: [product_id], references: [id])
+model SaboresPizza {
+  id         Int        @id @default(autoincrement())
+  idValor    Int        @map("id_valor")
+  idProduto  Int        @map("id_produto")
+  itemId     Int
+  dataCreate DateTime   @default(now()) @map("data_create")
+  dataUpdate DateTime?  @map("data_update")
+  Item       Item       @relation(fields: [itemId], references: [id], onDelete: NoAction)
+}
 
-  @@map("items")
-  order_id String
-  product_id String
+model Tamanho {
+  id         Int        @id @default(autoincrement())
+  produtoId  Int
+  tamanho    String     @db.VarChar(45)
+  dataCreate DateTime   @default(now()) @map("data_create")
+  dataUpdate DateTime?  @map("data_update")
+  Produto    Produto    @relation(fields: [produtoId], references: [id], onDelete: NoAction)
+}
 
+model Valor {
+  id         Int        @id @default(autoincrement())
+  produtoId  Int
+  preco      Decimal    @db.Decimal(12, 2)
+  tamanho    Boolean    @default(false)
+  status     Boolean    @default(true)
+  dataCreate DateTime   @default(now()) @map("data_create")
+  dataUpdate DateTime?  @map("data_update")
+  Produto    Produto    @relation(fields: [produtoId], references: [id], onDelete: NoAction)
 }
 
 model PasswordResetToken {
   id String @id @default(uuid())
-  userId String
+  pessoaId Int
   token String
   expiresAt DateTime
   created_at DateTime? @default(now())
   updated_at DateTime? @default(now())
 
-  user User @relation(fields: [userId], references: [id])
+  pessoa Pessoa @relation(fields: [pessoaId], references: [id])
 
   @@map("password_reset_tokens")
 }
-
-

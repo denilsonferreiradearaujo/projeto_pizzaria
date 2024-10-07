@@ -1,50 +1,58 @@
-import prismaCliente from "../../prisma";
+import prismaClient from "../../prisma";
 import { compare } from "bcryptjs";
 import { sign } from "jsonwebtoken";
 
 interface AuthRequest {
   email: string;
-  password: string;
+  senha: string;
 }
 
 class AuthUserService {
-  async execute({ email, password }: AuthRequest) {
-    // Verificcar se o email existe
-    const user = await prismaCliente.user.findFirst({
+  async execute({ email, senha }: AuthRequest) {
+    // Verificar se o email existe
+    const user = await prismaClient.pessoa.findFirst({
       where: {
-        email: email,
+        email: email
       },
+      include: {
+        logins: true // Inclui a relação com logins
+      }
     });
 
-    if (!user) {
-      throw new Error("User/Password incorrect");
+    // Verificar se o usuário existe e se há um login associado
+    if (!user || user.logins.length === 0) {
+      throw new Error('User/password incorrect');
     }
 
-    // Verificar se a senha que mandou está correta
-    const passwordMath = await compare(password, user.password);
+    // Obtém o login do usuário (assumindo o primeiro login, mas pode ajustar caso tenha múltiplos)
+    const login = user.logins[0];
 
-    if (!passwordMath) {
-      throw new Error("User/Password incorrect");
+    // Comparar a senha fornecida com a senha armazenada no banco de dados
+    const passwordMatch = await compare(senha, login.senha);
+
+    // Verifica a senha e retorna erro se não coincidir
+    if (!passwordMatch) {
+      throw new Error('User/password incorrect');
     }
 
-    // Gerar um token JWT de devolver para o usuario
+    // Gerar o token JWT
     const token = sign(
       {
-        name: user.name,
-        email: user.email,
+        nome: user.nome,
+        email: user.email
       },
       process.env.JWT_SECRET,
       {
-        subject: user.id,
-        expiresIn: "30d",
+        subject: String(user.id), // Garantir que subject seja uma string
+        expiresIn: '30d'
       }
     );
 
     return {
       id: user.id,
-      name: user.name,
+      nome: user.nome,
       email: user.email,
-      token: token,
+      token: token
     };
   }
 }

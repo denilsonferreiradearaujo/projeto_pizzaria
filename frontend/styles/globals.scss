@@ -1,3 +1,5 @@
+@import "~react-datepicker/dist/react-datepicker.css";
+
 *{
   margin: 0;
   padding: 0;
@@ -34,6 +36,17 @@ body{
 
 body, input, textarea, button{ 
   font: 400 1rem sans-serif;
+}
+
+.select, .datePicker{
+  margin-bottom: 1rem;
+  height: 40px;
+  border: 0;
+  border-radius: 0.5rem;
+  background-color: var(--dark-900);
+  color: var(--white);
+  padding: 1rem;
+  border: 1px solid var(--gray-100);
 }
 
 @media (max-widht: 720px){

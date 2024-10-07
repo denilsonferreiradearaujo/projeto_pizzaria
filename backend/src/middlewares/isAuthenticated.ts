@@ -1,29 +1,40 @@
+// isAuthenticated.ts
 import { NextFunction, Request, Response } from "express";
 import { verify } from "jsonwebtoken";
+import prisma from "../prisma";
 
 interface Payload {
-    sub: string;
+  sub: string;
 }
 
-export function isAuthenticated (
-    req: Request,
-    res: Response,
-    next: NextFunction
-){
-    // Receber o token
-    const authToken = req.headers.authorization;
+export async function isAuthenticated(req: Request, res: Response, next: NextFunction) {
+  const authToken = req.headers.authorization;
 
-    if(!authToken){
-        return res.status(401).end();
+  if (!authToken) {
+    return res.status(401).json({ error: "Token não fornecido!" });
+  }
+
+  const [, token] = authToken.split(" ");
+
+  try {
+    // Verificar e decodificar o token JWT
+    const decoded = verify(token, process.env.JWT_SECRET) as Payload;
+
+    // Buscar o usuário no banco de dados usando o Prisma
+    const user = await prisma.login.findUnique({
+      where: { id: parseInt(decoded.sub) },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "Usuário não encontrado!" });
     }
 
-    const [, token] = authToken.split(" ")
+    // Adicionar informações do usuário ao request para uso em rotas protegidas
+    req.userId = user.id;
+    req.tipoLogin = user.tipoLogin;
 
-    try {
-        const { sub } = verify(token, process.env.JWT_SECRET) as Payload;
-        req.user_id = sub;
-        return next();
-    } catch (err) {
-        return res.status(401).end();
-    }
+    return next();
+  } catch (err) {
+    return res.status(401).json({ error: "Token inválido!" });
+  }
 }

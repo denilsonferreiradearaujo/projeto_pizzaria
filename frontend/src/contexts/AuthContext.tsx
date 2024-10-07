@@ -20,27 +20,42 @@ type AuthContextData = {
 
 type UserProps = {
     id: string;
-    name: string;
+    nome: string;
     email: string;
 }
 
 type SignInProps = {
     email: string;
-    password: string;
+    senha: string;
 }
 
+// Supondo que `SignUpProps` esteja definido em algum lugar, altere a definição:
 type SignUpProps = {
-    name: string;
+    nome: string;
     email: string;
-    password: string;
-}
+    genero: string;
+    dataNasc: string;
+    cpf: string;
+    tipo: string;
+    senha: string;
+    cep: string;
+    logradouro: string;
+    numero: string;
+    complemento?: string; // Se for opcional
+    bairro: string;
+    cidade: string;
+    uf: string;
+    telefoneResidencial: String;
+    telefoneCelular: String;
+  };
+  
 
 type forgotPassProps = {
     email: string;
 }
 
 type resetPassProps = {
-    password: string;
+    senha: string;
     token: string | string[];
 }
 
@@ -73,11 +88,11 @@ export function AuthProvider({ children }: AuthProviderProps){
 
         if(token){
             api.get('/me').then(response => {
-                const {id, name, email} = response.data;
+                const {id, nome, email} = response.data;
 
                 setUser({
                     id,
-                    name,
+                    nome,
                     email
                 })
             })
@@ -88,16 +103,16 @@ export function AuthProvider({ children }: AuthProviderProps){
         }
     }, [])
 
-    async function signIn({email, password}: SignInProps){
+    async function signIn({email, senha}: SignInProps){
         try{
 
-            const response = await api.post('/session', {
+            const response = await api.post('/login', {
                 email,
-                password
+                senha
             })
-            // console.log(response.data)
+            console.log(response.data)
 
-            const {id, name, token} = response.data;
+            const {id, nome, token} = response.data;
 
             setCookie(undefined, '@nextauth.token', token, {
                 maxAge: 60 * 60 * 24 * 30, // Expira em 1 mês
@@ -106,7 +121,7 @@ export function AuthProvider({ children }: AuthProviderProps){
 
             setUser({
                 id,
-                name,
+                nome,
                 email,
             })
 
@@ -124,14 +139,28 @@ export function AuthProvider({ children }: AuthProviderProps){
         }
     }
 
-    async function signUp ({name, email, password}: SignUpProps){
+    async function signUp ({nome, email, genero, dataNasc, cpf, senha, cep, tipo, logradouro, numero, complemento, bairro, cidade, uf, telefoneResidencial, telefoneCelular}: SignUpProps){
         try{
             const response = await api.post('/users', {
-                name,
+                nome,
                 email,
-                password
+                genero,
+                dataNasc,
+                cpf,
+                tipo,
+                senha,
+                cep,
+                logradouro,
+                numero,
+                complemento,
+                bairro,
+                cidade,
+                uf,
+                telefoneResidencial,
+                telefoneCelular,
             })
 
+            console.log(response)
             // console.log("Cadastrado com sucesso!")
             toast.success('Conta criada com sucesso!')
 
@@ -161,10 +190,10 @@ export function AuthProvider({ children }: AuthProviderProps){
         }
     }
 
-    async function resetPass ({password, token}: resetPassProps){
+    async function resetPass ({senha, token}: resetPassProps){
         try{
             const response = await api.post(`/resetPassword/${token}`, {
-                password
+                senha
             })
 
             // console.log("Cadastrado com sucesso!")

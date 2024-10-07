@@ -17,7 +17,7 @@ import { toast } from "react-toastify";
 
 export default function ResetPassword() {
     const {resetPass} = useContext(AuthContext);
-    const [password, setPassword] = useState('');
+    const [senha, setSenha] = useState('');
     const [loading, setLoading] = useState(false);
 
     const router = useRouter();
@@ -26,7 +26,7 @@ export default function ResetPassword() {
     async function handleResetPassword(event: FormEvent){
         event.preventDefault();
 
-        if(password === ''){
+        if(senha === ''){
             toast.error("Preencha sua nova senha.")
             return;
         }
@@ -40,7 +40,7 @@ export default function ResetPassword() {
 
         try {
           let data = {
-              password,
+              senha,
               token // Incluindo o token no objeto data
           };
 
@@ -70,8 +70,8 @@ export default function ResetPassword() {
             <Input
               placeholder="Senha"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
             />
             
             <Button

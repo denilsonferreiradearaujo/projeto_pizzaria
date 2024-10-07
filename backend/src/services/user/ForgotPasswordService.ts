@@ -1,6 +1,4 @@
 import prismaCliente from "../../prisma";
-// import { hash, genSalt } from 'bcryptjs';
-import { v4 as uuidv4 } from 'uuid'; // para gerar tokens únicos
 import { sign } from "jsonwebtoken"; // Importar sign do JWT
 import { sendPasswordResetEmail } from "../../utils/email"; // Função fictícia para enviar e-mail
 
@@ -11,7 +9,7 @@ interface UserForgotPassword {
 class ForgotPasswordService {
     async execute({email}: UserForgotPassword) {
         // Verificar se o email está cadastrado
-        const user = await prismaCliente.user.findFirst({
+        const user = await prismaCliente.pessoa.findFirst({
             where: { email }
         });
 
@@ -33,7 +31,7 @@ class ForgotPasswordService {
         // Salvar o token no banco de dados (ou em uma tabela específica para tokens)
         await prismaCliente.passwordResetToken.create({
             data: {
-                userId: user.id,
+                pessoaId: user.id,
                 token: resetToken,
                 expiresAt: new Date(Date.now() + 3600000) // Token válido por 1 hora
             }

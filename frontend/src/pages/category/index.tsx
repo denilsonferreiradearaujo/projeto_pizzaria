@@ -9,24 +9,24 @@ import { toast } from 'react-toastify';
 import { canSSRAuth } from '@/src/utils/canSSRAuth';
 
 export default function Category(){
-    const [name, setName] = useState('')
+    const [nome, setNome] = useState('')
 
     async function handleRegister(event: FormEvent ){
         event.preventDefault();
 
-        if(name === ""){
+        if(nome === ""){
             toast.error('Insira o nome da categoria')
             return;
         }
 
         const apiCliente = setupAPICliente();
         await apiCliente.post('/category', {
-            name: name
+            nome: nome
         })
 
         toast.success('Categoria cadastrado com sucesso')
 
-        setName('');
+        setNome('');
     }
 
     return(
@@ -46,8 +46,8 @@ export default function Category(){
                         type='text'
                         placeholder='Digite o nome da categoria'
                         className={styles.input}
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        value={nome}
+                        onChange={(e) => setNome(e.target.value)}
                     />
 
                     <button className={styles.buttonAdd} type="submit">

@@ -56,7 +56,7 @@ export default function DashBoard({ orders }: HomeProps) {
     async function handleOpenModalView(id: string) {
         const apiCliente = setupAPICliente();
 
-        const response = await apiCliente.get('/order/detail', {
+        const response = await apiCliente.get('/pedido/status/:id', {
             params: {
                 order_id: id,
             }
@@ -81,7 +81,7 @@ export default function DashBoard({ orders }: HomeProps) {
 
     async function handleRefresh(){
         const apiCliente = setupAPICliente();
-        const response = await apiCliente.get('/orders');
+        const response = await apiCliente.get('/listPedidos');
         setOrderList(response.data);
     }
 
@@ -138,7 +138,7 @@ export default function DashBoard({ orders }: HomeProps) {
 export const getServerSideProps = canSSRAuth(async (ctx) => {
     const apiCliente = setupAPICliente(ctx);
 
-    const response = await apiCliente.get('/orders');
+    const response = await apiCliente.get('/listPedidos');
 
     return {
         props: {

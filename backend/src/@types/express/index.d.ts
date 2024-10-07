@@ -1,30 +1,10 @@
-declare namespace Express{
-    export interface Request {
-        user_id: string;
-    }
+// import { Login } from '@prisma/client'; // Se estiver usando a definição do Prisma, importe como necessário.
+
+// Importação do express para poder estender as interfaces.
+declare namespace Express {
+  // Extende a interface Request para incluir as novas propriedades
+  export interface Request {
+    userId?: number; // ID do usuário que é setado no isAuthenticated
+    tipoLogin?: string; // Tipo de login (cliente, funcionario)
+  }
 }
-
-
-// @types/express.d.ts
-
-// import { Request } from 'express';
-
-// declare module 'express' {
-//   export interface Request {
-//     user_id?: string;
-//   }
-// }
-
-
-// src/@types/express/index.d.ts
-// import { Request } from 'express';
-
-// declare module 'express-serve-static-core' {
-//   interface Request {
-//     user_id?: string;
-//   }
-// }
-
-
-
-
